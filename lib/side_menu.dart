@@ -4,6 +4,7 @@ import 'about_us_screen.dart';
 import 'link_child_screen.dart';
 import 'notifications_screen.dart';
 import 'main.dart';
+import 'profile_screen.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu({super.key});
@@ -16,11 +17,11 @@ class SideMenu extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 100,
+              height: 120,
               width: double.infinity,
               color: const Color(0xFF2E7D32),
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(left: 20, top: 30),
+              padding: const EdgeInsets.only(left: 20, top: 40),
               child: const Row(
                 children: [
                   Icon(Icons.menu, color: Colors.white, size: 30),
@@ -36,25 +37,32 @@ class SideMenu extends StatelessWidget {
                 ],
               ),
             ),
-
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  _buildDrawerItem(
+                  _buildItem(
+                    context,
                     Icons.home,
                     "Home Page",
                     isSelected: true,
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
                   ),
-                  _buildDrawerItem(
+                  _buildItem(
+                    context,
                     Icons.account_circle,
                     "Parent Profile",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfilePage(),
+                        ),
+                      );
+                    },
                   ),
-                  _buildDrawerItem(
+                  _buildItem(
+                    context,
                     Icons.accessibility_new,
                     "Children Information",
                     onTap: () {
@@ -114,6 +122,11 @@ class SideMenu extends StatelessWidget {
                         ),
                       );
                     },),
+                  ),
+                  _buildItem(context, Icons.group_add, "Link Child"),
+                  _buildItem(context, Icons.notifications, "Notifications"),
+                  _buildItem(context, Icons.info, "About Us"),
+                  _buildItem(context, Icons.exit_to_app, "Log Out"),
                 ],
               ),
             ),
@@ -123,7 +136,8 @@ class SideMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(
+  Widget _buildItem(
+    BuildContext context,
     IconData icon,
     String title, {
     bool isSelected = false,
@@ -143,10 +157,9 @@ class SideMenu extends StatelessWidget {
           style: const TextStyle(
             color: Color(0xFF2E7D32),
             fontWeight: FontWeight.bold,
-            fontSize: 16,
           ),
         ),
-        onTap: onTap,
+        onTap: onTap ?? () => Navigator.pop(context),
       ),
     );
   }
