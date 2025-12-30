@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import 'children_information_screen.dart';
+import 'about_us_screen.dart';
+import 'link_child_screen.dart';
+import 'notifications_screen.dart';
 import 'profile_screen.dart';
+import 'home_screen.dart';
+import 'main.dart';
 
-class SideMenu extends StatelessWidget {
+class SideMenu extends StatefulWidget {
   const SideMenu({super.key});
+
+  @override
+  State<SideMenu> createState() => _SideMenuState();
+}
+
+class _SideMenuState extends State<SideMenu> {
+  static String selectedItem = 'Home Page';
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +25,11 @@ class SideMenu extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 120,
+              height: 100,
               width: double.infinity,
               color: const Color(0xFF2E7D32),
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(left: 20, top: 40),
+              padding: const EdgeInsets.only(left: 20, top: 30),
               child: const Row(
                 children: [
                   Icon(Icons.menu, color: Colors.white, size: 30),
@@ -32,39 +45,68 @@ class SideMenu extends StatelessWidget {
                 ],
               ),
             ),
+
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  _buildItem(
-                    context,
+                  _buildDrawerItem(
                     Icons.home,
                     "Home Page",
-                    isSelected: true,
+                    onTap: () {
+                      _navigate(context, "Home Page", const HomeScreen());
+                    },
                   ),
-                  _buildItem(
-                    context,
+                  _buildDrawerItem(
                     Icons.account_circle,
                     "Parent Profile",
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
+                      _navigate(context, "Parent Profile", const ProfilePage());
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.accessibility_new,
+                    "Children Information",
+                    onTap: () {
+                      _navigate(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePage(),
-                        ),
+                        "Children Information",
+                        const ChildrenInformationScreen(),
                       );
                     },
                   ),
-                  _buildItem(
-                    context,
-                    Icons.accessibility_new,
-                    "Children Information",
+                  _buildDrawerItem(
+                    Icons.group_add,
+                    "Link Child",
+                    onTap: () {
+                      _navigate(context, "Link Child", const LinkChildScreen());
+                    },
                   ),
-                  _buildItem(context, Icons.group_add, "Link Child"),
-                  _buildItem(context, Icons.notifications, "Notifications"),
-                  _buildItem(context, Icons.info, "About Us"),
-                  _buildItem(context, Icons.exit_to_app, "Log Out"),
+                  _buildDrawerItem(
+                    Icons.notifications,
+                    "Notifications",
+                    onTap: () {
+                      _navigate(
+                        context,
+                        "Notifications",
+                        const NotificationsScreen(),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.info,
+                    "About Us",
+                    onTap: () {
+                      _navigate(context, "About Us", const AboutUsScreen());
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.exit_to_app,
+                    "Log Out",
+                    onTap: () {
+                      _navigate(context, "Log Out", const LoginScreen());
+                    },
+                  ),
                 ],
               ),
             ),
@@ -74,13 +116,17 @@ class SideMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(
-    BuildContext context,
-    IconData icon,
-    String title, {
-    bool isSelected = false,
-    VoidCallback? onTap,
-  }) {
+  void _navigate(BuildContext context, String title, Widget screen) {
+    setState(() {
+      selectedItem = title;
+    });
+    Navigator.pop(context);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+  }
+
+  Widget _buildDrawerItem(IconData icon, String title, {VoidCallback? onTap}) {
+    bool isSelected = selectedItem == title;
+
     return Container(
       decoration: BoxDecoration(
         color: isSelected ? const Color(0xFFD6E6D1) : Colors.transparent,
@@ -95,9 +141,10 @@ class SideMenu extends StatelessWidget {
           style: const TextStyle(
             color: Color(0xFF2E7D32),
             fontWeight: FontWeight.bold,
+            fontSize: 16,
           ),
         ),
-        onTap: onTap ?? () => Navigator.pop(context),
+        onTap: onTap,
       ),
     );
   }
