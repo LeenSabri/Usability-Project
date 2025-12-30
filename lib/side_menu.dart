@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'children_information_screen.dart';
+import 'about_us_screen.dart';
+import 'link_child_screen.dart';
+import 'notifications_screen.dart';
+import 'main.dart';
 import 'profile_screen.dart';
 
 class SideMenu extends StatelessWidget {
@@ -60,6 +65,63 @@ class SideMenu extends StatelessWidget {
                     context,
                     Icons.accessibility_new,
                     "Children Information",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const ChildrenInformationScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.group_add,
+                    "Link Child",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LinkChildScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.notifications,
+                    "Notifications",
+                    onTap: () {
+                      Navigator.pop(context); 
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const NotificationsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.info,
+                    "About Us",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AboutUsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(Icons.exit_to_app, "Log Out", onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },),
                   ),
                   _buildItem(context, Icons.group_add, "Link Child"),
                   _buildItem(context, Icons.notifications, "Notifications"),
