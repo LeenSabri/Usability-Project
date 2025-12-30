@@ -6,6 +6,7 @@ import 'notifications_screen.dart';
 import 'about_us_screen.dart';
 import 'profile_screen.dart';
 
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -46,6 +47,7 @@ class HomeScreen extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => const NotificationsScreen(),
                 ),
+
               );
             },
           ),
@@ -59,6 +61,7 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 20,
           mainAxisSpacing: 20,
           children: [
+
             _buildHomeButton(
               context,
               Icons.person,
@@ -102,6 +105,7 @@ class HomeScreen extends StatelessWidget {
     String label,
     Widget? destination,
   ) {
+
     return InkWell(
       onTap: () {
         if (destination != null) {
@@ -110,7 +114,6 @@ class HomeScreen extends StatelessWidget {
             MaterialPageRoute(builder: (context) => destination),
           );
         } else if (label == "Log Out") {
-          // إذا كان الزر هو تسجيل الخروج، يعود لصفحة الدخول
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       },
