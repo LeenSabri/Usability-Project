@@ -1,91 +1,11 @@
-// import 'package:flutter/material.dart';
-// import 'side_menu.dart';
-
-// class HomeScreen extends StatelessWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: const Color(0xFFE8E2D2),
-//       drawer: const SideMenu(),
-
-//       appBar: AppBar(
-//         backgroundColor: const Color(0xFF2E7D32),
-//         elevation: 0,
-//         leading: Builder(
-//           builder: (context) => IconButton(
-//             icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-//             onPressed: () => Scaffold.of(context).openDrawer(),
-//           ),
-//         ),
-//         title: const Text(
-//           "Home",
-//           style: TextStyle(
-//             color: Colors.white,
-//             fontSize: 24,
-//             fontWeight: FontWeight.bold,
-//           ),
-//         ),
-//         actions: [
-//           const Icon(Icons.account_circle, color: Colors.white, size: 35),
-//           const SizedBox(width: 15),
-//           const Icon(Icons.notifications, color: Colors.white, size: 30),
-//           const SizedBox(width: 15),
-//         ],
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(20.0),
-//         child: GridView.count(
-//           crossAxisCount: 2,
-//           crossAxisSpacing: 20,
-//           mainAxisSpacing: 20,
-//           children: [
-//             _buildHomeButton(Icons.person, "Parent Profile"),
-//             _buildHomeButton(Icons.accessibility_new, "Children Information"),
-//             _buildHomeButton(Icons.group_add, "Link Child"),
-//             _buildHomeButton(Icons.notifications_active, "Notifications"),
-//             _buildHomeButton(Icons.exit_to_app, "Log Out"),
-//             _buildHomeButton(Icons.info, "About Us"),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildHomeButton(IconData icon, String label) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: const Color(0xFFD6E6D1),
-//         borderRadius: BorderRadius.circular(15),
-//         border: Border.all(color: const Color(0xFF2E7D32), width: 2),
-//       ),
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           Icon(icon, size: 50, color: const Color(0xFF2E7D32)),
-//           const SizedBox(height: 10),
-//           Text(
-//             label,
-//             textAlign: TextAlign.center,
-//             style: const TextStyle(
-//               fontWeight: FontWeight.bold,
-//               color: Color(0xFF2E7D32),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
 import 'package:flutter/material.dart';
 import 'side_menu.dart';
-import 'children_information_screen.dart'; // استيراد الصفحات
+import 'children_information_screen.dart';
 import 'link_child_screen.dart';
 import 'notifications_screen.dart';
 import 'about_us_screen.dart';
+import 'profile_screen.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -116,11 +36,18 @@ class HomeScreen extends StatelessWidget {
           const Icon(Icons.account_circle, color: Colors.white, size: 35),
           const SizedBox(width: 15),
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white, size: 30),
+            icon: const Icon(
+              Icons.notifications,
+              color: Colors.white,
+              size: 30,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsScreen(),
+                ),
+
               );
             },
           ),
@@ -134,19 +61,51 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 20,
           mainAxisSpacing: 20,
           children: [
-            _buildHomeButton(context, Icons.person, "Parent Profile", null), // اتركها فارغة حالياً
-            _buildHomeButton(context, Icons.accessibility_new, "Children Information", const ChildrenInformationScreen()),
-            _buildHomeButton(context, Icons.group_add, "Link Child", const LinkChildScreen()),
-            _buildHomeButton(context, Icons.notifications_active, "Notifications", const NotificationsScreen()),
-            _buildHomeButton(context, Icons.exit_to_app, "Log Out", null), // للتعامل مع تسجيل الخروج لاحقاً
-            _buildHomeButton(context, Icons.info, "About Us", const AboutUsScreen()),
+
+            _buildHomeButton(
+              context,
+              Icons.person,
+              "Parent Profile",
+              const ProfilePage(),
+            ),
+            _buildHomeButton(
+              context,
+              Icons.accessibility_new,
+              "Children Information",
+              const ChildrenInformationScreen(),
+            ),
+            _buildHomeButton(
+              context,
+              Icons.group_add,
+              "Link Child",
+              const LinkChildScreen(),
+            ),
+            _buildHomeButton(
+              context,
+              Icons.notifications_active,
+              "Notifications",
+              const NotificationsScreen(),
+            ),
+            _buildHomeButton(context, Icons.exit_to_app, "Log Out", null),
+            _buildHomeButton(
+              context,
+              Icons.info,
+              "About Us",
+              const AboutUsScreen(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHomeButton(BuildContext context, IconData icon, String label, Widget? destination) {
+  Widget _buildHomeButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    Widget? destination,
+  ) {
+
     return InkWell(
       onTap: () {
         if (destination != null) {
@@ -155,7 +114,6 @@ class HomeScreen extends StatelessWidget {
             MaterialPageRoute(builder: (context) => destination),
           );
         } else if (label == "Log Out") {
-          // إذا كان الزر هو تسجيل الخروج، يعود لصفحة الدخول
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       },
