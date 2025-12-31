@@ -5,6 +5,7 @@ import 'link_child_screen.dart';
 import 'notifications_screen.dart';
 import 'about_us_screen.dart';
 import 'profile_screen.dart';
+import 'app_bar.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -15,45 +16,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
       drawer: const SideMenu(),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "Home",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          const Icon(Icons.account_circle, color: Colors.white, size: 35),
-          const SizedBox(width: 15),
-          IconButton(
-            icon: const Icon(
-              Icons.notifications,
-              color: Colors.white,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationsScreen(),
-                ),
-
-              );
-            },
-          ),
-          const SizedBox(width: 15),
-        ],
-      ),
+      appBar: const CustomAppBar(title: "Home"),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: GridView.count(

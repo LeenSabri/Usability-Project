@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'side_menu.dart';
 import 'change_password_screen.dart';
+import 'app_bar.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -10,20 +11,8 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFE6E0D3),
       drawer: SideMenu(),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "Profile",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
+      appBar: const CustomAppBar(title: "Profile"),
+
       body: SizedBox(
         width: double.infinity,
         child: Column(

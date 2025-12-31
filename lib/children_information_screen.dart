@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'side_menu.dart'; 
+import 'side_menu.dart';
+import 'app_bar.dart';
 
 class ChildrenInformationScreen extends StatelessWidget {
   const ChildrenInformationScreen({super.key});
@@ -8,27 +9,8 @@ class ChildrenInformationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
-      drawer: const SideMenu(), 
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "Children Information",
-          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          const Icon(Icons.account_circle, color: Colors.white, size: 35),
-          const SizedBox(width: 15),
-          const Icon(Icons.notifications, color: Colors.white, size: 30),
-          const SizedBox(width: 15),
-        ],
-      ),
+      drawer: const SideMenu(),
+      appBar: const CustomAppBar(title: "Children Information"),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: ListView(
@@ -48,26 +30,41 @@ class ChildrenInformationScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFFD6E6D1), 
+        color: const Color(0xFFD6E6D1),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.3), width: 1),
+        border: Border.all(
+          color: const Color(0xFF2E7D32).withOpacity(0.3),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "Child Name: $name",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Colors.black87,
+            ),
           ),
           const SizedBox(height: 5),
           Text(
             "Child username: $username",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Colors.black87,
+            ),
           ),
           const SizedBox(height: 5),
           Text(
             "Child Age: $age",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),

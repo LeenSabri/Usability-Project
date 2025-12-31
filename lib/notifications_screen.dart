@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'side_menu.dart';
+import 'app_bar.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -16,30 +17,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
       drawer: const SideMenu(),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "Notification",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: const [
-          Icon(Icons.account_circle, color: Colors.white, size: 35),
-          SizedBox(width: 15),
-          Icon(Icons.notifications, color: Colors.white, size: 30),
-          SizedBox(width: 15),
-        ],
-      ),
+      appBar: const CustomAppBar(title: "Notifications"),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: ListView(

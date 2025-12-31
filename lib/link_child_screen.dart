@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'side_menu.dart';
+import 'app_bar.dart';
 
 class LinkChildScreen extends StatefulWidget {
   const LinkChildScreen({super.key});
@@ -16,37 +17,18 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
       drawer: const SideMenu(),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "Link Child",
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          const Icon(Icons.account_circle, color: Colors.white, size: 35),
-          const SizedBox(width: 15),
-          const Icon(Icons.notifications, color: Colors.white, size: 30),
-          const SizedBox(width: 15),
-        ],
-      ),
+      appBar: const CustomAppBar(title: "Link Child"),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 60), 
-            
+            const SizedBox(height: 60),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD6E6D1), 
+                  color: const Color(0xFFD6E6D1),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -61,25 +43,25 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
                   children: [
                     _buildLabel("Username for child on Luanti"),
                     _buildTextField("Input text"),
-                    
+
                     const SizedBox(height: 15),
                     _buildLabel("Full Name For Child"),
                     _buildTextField("Input text"),
-                    
+
                     const SizedBox(height: 15),
                     _buildLabel("Age For Child"),
                     _buildTextField("Input text"),
-                    
+
                     const SizedBox(height: 15),
                     _buildLabel("Family Relation"),
                     _buildDropdown(),
-                    
+
                     const SizedBox(height: 15),
-                    _buildLabel("Pasword"), 
+                    _buildLabel("Pasword"),
                     _buildTextField("Input text", isPassword: true),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     Align(
                       alignment: Alignment.bottomRight,
                       child: SizedBox(
@@ -95,7 +77,10 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
                           ),
                           child: const Text(
                             "Next",
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -104,7 +89,7 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 40), 
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -136,7 +121,10 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
         obscureText: isPassword,
         decoration: InputDecoration(
           hintText: hint,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 10,
+          ),
           border: InputBorder.none,
         ),
       ),
@@ -157,10 +145,7 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
           hint: const Text("Dropdown"),
           value: selectedRelation,
           items: ["Father", "Mother", "Guardian"].map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
+            return DropdownMenuItem<String>(value: value, child: Text(value));
           }).toList(),
           onChanged: (newValue) {
             setState(() {
