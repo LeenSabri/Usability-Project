@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'about_us_screen.dart';
 
 class FingerprintScreen extends StatelessWidget {
   const FingerprintScreen({super.key});
@@ -42,13 +43,24 @@ class FingerprintScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Positioned(
-              bottom: 20,
-              right: 20,
-              child: Icon(
-                Icons.info_outline,
-                size: 45,
-                color: Color(0xFF5BA320),
+
+            const SizedBox(height: 120),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AboutUsScreen(),
+                    ),
+                  );
+                },
+                child: const Icon(
+                  Icons.info_outline,
+                  size: 45,
+                  color: Color(0xFF5BA320),
+                ),
               ),
             ),
           ],

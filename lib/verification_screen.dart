@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'fingerprint_screen.dart';
+import 'about_us_screen.dart';
+import 'sign_up_screen.dart';
 
 class VerificationScreen extends StatelessWidget {
   const VerificationScreen({super.key});
@@ -104,7 +106,14 @@ class VerificationScreen extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignUpScreen(),
+                          ),
+                        );
+                      },
                       child: const Text(
                         "Sign Up",
                         style: TextStyle(
@@ -118,15 +127,25 @@ class VerificationScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 120),
-
-                const Align(
+                Align(
                   alignment: Alignment.bottomRight,
-                  child: Icon(
-                    Icons.info_outline,
-                    size: 45,
-                    color: Color(0xFF5BA320),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AboutUsScreen(),
+                        ),
+                      );
+                    },
+                    child: const Icon(
+                      Icons.info_outline,
+                      size: 45,
+                      color: Color(0xFF5BA320),
+                    ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),
