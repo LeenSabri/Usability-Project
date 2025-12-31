@@ -9,13 +9,15 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  final double buttonWidth = 110.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
       drawer: const SideMenu(),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32), 
+        backgroundColor: const Color(0xFF2E7D32),
         elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
@@ -25,13 +27,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         title: const Text(
           "Notification",
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        actions: [
-          const Icon(Icons.account_circle, color: Colors.white, size: 35),
-          const SizedBox(width: 15),
-          const Icon(Icons.notifications, color: Colors.white, size: 30),
-          const SizedBox(width: 15),
+        actions: const [
+          Icon(Icons.account_circle, color: Colors.white, size: 35),
+          SizedBox(width: 15),
+          Icon(Icons.notifications, color: Colors.white, size: 30),
+          SizedBox(width: 15),
         ],
       ),
       body: Padding(
@@ -67,7 +73,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const Text(
-              "We have blocked a message for your your child in Luanti",
+              "We have blocked a message for your child in Luanti",
               style: TextStyle(fontSize: 14),
             ),
           ],
@@ -85,15 +91,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
+            const Icon(
+              Icons.account_circle,
+              size: 80,
+              color: Color(0xFF2E7D32),
             ),
-            const Icon(Icons.account_circle, size: 80, color: Color(0xFF2E7D32)),
-            const Text("Samer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text(
+              "Samer",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
             const Text(
               "We have blocked a message in luanti\nthat posed a potential risk.",
               textAlign: TextAlign.center,
@@ -106,32 +112,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              "Another player asked $childName to share private information (address of your child). This conversation was immediately blocked.",
+              "Another player asked $childName to share private information (address of your child).",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 12),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _showUnblockConfirm(childName);
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text("Unblock", style: TextStyle(color: Colors.white)),
-                ),
-                ElevatedButton(
-                  onPressed: () {
+                _buildUnifiedButton("Unblock", Colors.red, Colors.white, () {
+                  Navigator.pop(context);
+                  _showUnblockConfirm(childName);
+                }),
+                const SizedBox(width: 10),
+                _buildUnifiedButton(
+                  "View",
+                  const Color(0xFFF9C846),
+                  Colors.black,
+                  () {
                     Navigator.pop(context);
                     _showDisplayMessage(childName);
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF9C846)),
-                  child: const Text("View Message", style: TextStyle(color: Colors.black)),
                 ),
               ],
-            )
+            ),
+            const SizedBox(height: 10),
+            _buildUnifiedButton("Close", Colors.grey[400]!, Colors.black, () {
+              Navigator.pop(context);
+            }, width: buttonWidth * 2 + 10),
           ],
         ),
       ),
@@ -147,19 +155,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "The Message",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32), fontSize: 18),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
+            const Text(
+              "The Message",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2E7D32),
+                fontSize: 18,
+              ),
             ),
+            const SizedBox(height: 15),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(15),
@@ -172,20 +176,29 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 style: TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showViewAlert(childName);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF9C846),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            const SizedBox(height: 25),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildUnifiedButton(
+                  "Back",
+                  const Color(0xFFF9C846),
+                  Colors.black,
+                  () {
+                    Navigator.pop(context);
+                    _showViewAlert(childName);
+                  },
                 ),
-                child: const Text("Back", style: TextStyle(color: Colors.black)),
-              ),
+                const SizedBox(width: 10),
+                _buildUnifiedButton(
+                  "Close",
+                  Colors.grey[400]!,
+                  Colors.black,
+                  () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -196,38 +209,75 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void _showUnblockConfirm(String childName) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Column(
           children: [
             Icon(Icons.account_circle, size: 60, color: Colors.grey),
-            Text("Samer", style: TextStyle(fontSize: 14)),
             Text(
               "Unblock Conversation",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32)),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2E7D32),
+                fontSize: 18,
+              ),
             ),
           ],
         ),
         content: const Text(
-          "If you unblock this conversation, you are confirming that this conversation is not dangerous for your child",
+          "Confirm that this conversation is not dangerous for your child?",
           textAlign: TextAlign.center,
         ),
-        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.only(bottom: 20),
         actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text("Yes", style: TextStyle(color: Colors.white)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _showViewAlert(childName);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF9C846)),
-            child: const Text("No", style: TextStyle(color: Colors.black)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildUnifiedButton(
+                "Yes",
+                Colors.red,
+                Colors.white,
+                () => Navigator.pop(context),
+              ),
+              const SizedBox(width: 10),
+              _buildUnifiedButton(
+                "No",
+                const Color(0xFFF9C846),
+                Colors.black,
+                () {
+                  Navigator.pop(context);
+                  _showViewAlert(childName);
+                },
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildUnifiedButton(
+    String text,
+    Color bgColor,
+    Color textColor,
+    VoidCallback onPressed, {
+    double? width,
+  }) {
+    return SizedBox(
+      width: width ?? buttonWidth,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: bgColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

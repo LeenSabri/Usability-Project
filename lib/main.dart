@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'sign_up_screen.dart';
 import 'verification_screen.dart';
+import 'about_us_screen.dart';
 
 void main() {
   runApp(const SafeLuantiApp());
@@ -127,13 +128,24 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 120),
-                const Align(
+                Align(
                   alignment: Alignment.bottomRight,
-                  child: Icon(
-                    Icons.info_outline,
-                    size: 45,
-                    color: Color(0xFF5BA320),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AboutUsScreen(),
+                        ),
+                      );
+                    },
+                    child: const Icon(
+                      Icons.info_outline,
+                      size: 45,
+                      color: Color(0xFF5BA320),
+                    ),
                   ),
                 ),
               ],

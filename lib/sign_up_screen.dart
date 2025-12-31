@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'verification_screen.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -14,14 +15,15 @@ class SignUpScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 50),
-
-                const SizedBox(height: 20),
                 Image.asset(
                   'assets/logo.png',
                   height: 200,
                   fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.image, size: 100, color: Colors.grey),
                 ),
                 const SizedBox(height: 30),
+
                 Container(
                   padding: const EdgeInsets.all(25),
                   decoration: BoxDecoration(
@@ -40,11 +42,20 @@ class SignUpScreen extends StatelessWidget {
                       _buildLabel("Confirm Password"),
                       _buildTextField("............", isPassword: true),
                       const SizedBox(height: 30),
+
                       SizedBox(
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const VerificationScreen(),
+                              ),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF64A121),
                             shape: RoundedRectangleBorder(
@@ -61,6 +72,7 @@ class SignUpScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 25),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -69,7 +81,9 @@ class SignUpScreen extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/');
+                      },
                       child: const Text(
                         "Sign In",
                         style: TextStyle(
@@ -82,12 +96,18 @@ class SignUpScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 40),
+
                 Align(
                   alignment: Alignment.bottomRight,
-                  child: Icon(
-                    Icons.info_outline,
-                    size: 45,
-                    color: Color(0xFF5BA320),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/about');
+                    },
+                    child: const Icon(
+                      Icons.info_outline,
+                      size: 45,
+                      color: Color(0xFF5BA320),
+                    ),
                   ),
                 ),
               ],
