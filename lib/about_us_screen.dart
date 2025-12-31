@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'side_menu.dart';
+import 'app_bar.dart';
 
 class AboutUsScreen extends StatelessWidget {
   const AboutUsScreen({super.key});
@@ -9,24 +10,7 @@ class AboutUsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
       drawer: const SideMenu(),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "About Us",
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          const Icon(Icons.account_circle, color: Colors.white, size: 35),
-          const SizedBox(width: 15),
-        ],
-      ),
+      appBar: const CustomAppBar(title: "About Us"),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -48,13 +32,17 @@ class AboutUsScreen extends StatelessWidget {
                   SizedBox(height: 10),
                   Text(
                     "Safe Luanti is a smart, safety platform created to give parents peace of mind while their children enjoy the creativity and fun of the Luanti game world. We understand that online play can expose kids to unexpected risks, which is why Safe Luanti alerts parents the moment something concerning appears. From bullying and inappropriate language to grooming attempts or unsafe conversations.\n\nOur mission is simple: to build a safer digital playground. With real-time alerts, clear insights into your child’s interactions, We believe every child deserves a safe online experience, and every parent deserves the tools to make that possible.",
-                    style: TextStyle(fontSize: 15, height: 1.4, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.4,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 40),
-            
+
             const Row(
               children: [
                 Icon(Icons.email_outlined, size: 30),
@@ -70,10 +58,10 @@ class AboutUsScreen extends StatelessWidget {
               child: Text(
                 "SafeLuanti@gmail.com",
                 style: TextStyle(
-                  fontSize: 18, 
-                  color: Colors.blue, 
+                  fontSize: 18,
+                  color: Colors.blue,
                   decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.w500
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

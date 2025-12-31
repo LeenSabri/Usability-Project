@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'side_menu.dart';
+import 'app_bar.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
   const ChangePasswordScreen({super.key});
@@ -45,19 +46,7 @@ class ChangePasswordScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFE6E0D3),
       drawer: SideMenu(),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        title: const Text(
-          "Change Password",
-          style: TextStyle(color: Colors.white),
-        ),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-      ),
+      appBar: const CustomAppBar(title: "Change Password"),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
