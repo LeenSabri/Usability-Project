@@ -1,0 +1,11 @@
+{
+  "name": "safeluanti-backend",
+  "version": "1.0.0",
+  "description": "AI moderation backend for SafeLuanti",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.19.2",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5"
+  }
+}
