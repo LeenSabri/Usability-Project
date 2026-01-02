@@ -1,7 +1,7 @@
 const express = require("express");
 const { moderateText } = require("../services/openaiModeration");
 const { analyzeText } = require("../services/perspectiveModeration");
-const { applyPolicy } = require("../services/policyEngine");
+const { applyPolicy } = require("../policyEngine");
 
 const router = express.Router();
 
@@ -19,6 +19,8 @@ router.post("/chat", async (req, res) => {
     const decision = applyPolicy(openaiResult, perspectiveResult);
 
     res.json({
+      player,
+      message,
       decision,
       openai: {
         flagged: openaiResult.flagged,
@@ -26,10 +28,9 @@ router.post("/chat", async (req, res) => {
       },
       perspective: perspectiveResult
     });
-
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ decision: "ALLOW" });
+    console.error("Moderation error:", error);
+    res.status(500).json({ error: "Moderation failed" });
   }
 });
 
