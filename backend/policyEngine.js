@@ -1,4 +1,5 @@
 function applyPolicy(openai, perspective) {
+  // Hard parental blocks
   if (
     openai.categories.sexual ||
     openai.categories.hate ||
@@ -7,6 +8,7 @@ function applyPolicy(openai, perspective) {
     return "BLOCK";
   }
 
+  // Severe behavioral risk → FLAG
   if (
     perspective.toxicity > 0.85 ||
     perspective.threat > 0.70 ||
@@ -15,6 +17,7 @@ function applyPolicy(openai, perspective) {
     return "FLAG";
   }
 
+  // OpenAI flagged but not explicit → FLAG
   if (openai.flagged) {
     return "FLAG";
   }
