@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'side_menu.dart';
 import 'children_information_screen.dart';
 import 'link_child_screen.dart';
@@ -6,6 +7,7 @@ import 'notifications_screen.dart';
 import 'about_us_screen.dart';
 import 'profile_screen.dart';
 import 'app_bar.dart';
+import 'main.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -70,14 +72,23 @@ class HomeScreen extends StatelessWidget {
   ) {
 
     return InkWell(
-      onTap: () {
+      onTap: () async {
         if (destination != null) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => destination),
           );
         } else if (label == "Log Out") {
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.clear();
+
+          if (context.mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false,
+            );
+          }
         }
       },
       borderRadius: BorderRadius.circular(15),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'side_menu.dart';
 import 'app_bar.dart';
 
@@ -11,6 +14,66 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final double buttonWidth = 110.0;
+  List<dynamic> _notifications = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  Future<void> _fetchNotifications() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      final response = await http.get(
+        Uri.parse('http://192.168.2.19:3000/notifications'),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _notifications = jsonDecode(response.body);
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching notifications: $e");
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _unblockNotification(int notificationId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      final response = await http.patch(
+        Uri.parse(
+          'http://192.168.2.19:3000/notifications/unblock/$notificationId',
+        ),
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Conversation unblocked successfully"),
+            ),
+          );
+        }
+        _fetchNotifications();
+      }
+    } catch (e) {
+      debugPrint("Error unblocking: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,28 +81,35 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       backgroundColor: const Color(0xFFE8E2D2),
       drawer: const SideMenu(),
       appBar: const CustomAppBar(title: "Notifications"),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: ListView(
-          children: [
-            _buildNotificationCard("Rawan Yahya"),
-            _buildNotificationCard("Lana Zaben"),
-            _buildNotificationCard("Leen Sabri"),
-            _buildNotificationCard("Diaa Nawawreh"),
-          ],
-        ),
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: Colors.green))
+          : Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: _notifications.isEmpty
+                  ? const Center(child: Text("No notifications found"))
+                  : ListView.builder(
+                      itemCount: _notifications.length,
+                      itemBuilder: (context, index) {
+                        return _buildNotificationCard(_notifications[index]);
+                      },
+                    ),
+            ),
     );
   }
 
-  Widget _buildNotificationCard(String childName) {
+  Widget _buildNotificationCard(Map<String, dynamic> notif) {
+    String childName = notif['child_name'] ?? "Child Name";
+    String status = notif['status'] ?? "blocked";
+
     return InkWell(
-      onTap: () => _showViewAlert(childName),
+      onTap: () => _showViewAlert(notif),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFD6E6D1),
+          color: status == "unblocked"
+              ? Colors.white70
+              : const Color(0xFFD6E6D1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.black12),
         ),
@@ -48,11 +118,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             Text(
               childName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const Text(
               "We have blocked a message for your child in Luanti",
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14, color: Colors.black87),
             ),
           ],
         ),
@@ -60,7 +130,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  void _showViewAlert(String childName) {
+  void _showViewAlert(Map<String, dynamic> notif) {
+    String childName = notif['child_name'] ?? "Your Child";
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -74,9 +146,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               size: 80,
               color: Color(0xFF2E7D32),
             ),
-            const Text(
-              "Samer",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Text(
+              childName,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const Text(
               "We have blocked a message in luanti\nthat posed a potential risk.",
@@ -84,13 +156,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Reason: Request to Share Personal Information",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            Text(
+              "Reason: ${notif['reason'] ?? 'Sensitive Content'}",
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
-              "Another player asked $childName to share private information (address of your child).",
+              "Another player asked $childName to share private information.",
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 12),
             ),
@@ -98,10 +170,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildUnifiedButton("Unblock", Colors.red, Colors.white, () {
-                  Navigator.pop(context);
-                  _showUnblockConfirm(childName);
-                }),
+                if (notif['status'] == 'blocked')
+                  _buildUnifiedButton("Unblock", Colors.red, Colors.white, () {
+                    Navigator.pop(context);
+                    _showUnblockConfirm(notif);
+                  }),
                 const SizedBox(width: 10),
                 _buildUnifiedButton(
                   "View",
@@ -109,7 +182,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   Colors.black,
                   () {
                     Navigator.pop(context);
-                    _showDisplayMessage(childName);
+                    _showDisplayMessage(notif);
                   },
                 ),
               ],
@@ -124,7 +197,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  void _showDisplayMessage(String childName) {
+  void _showDisplayMessage(Map<String, dynamic> notif) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -149,9 +222,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: const Color(0xFFD6E6D1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                "Hi Rawan, Can you send me your location to visit you",
-                style: TextStyle(fontWeight: FontWeight.w500),
+              child: Text(
+                notif['message_content'] ?? "No content available",
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
             const SizedBox(height: 25),
@@ -164,7 +237,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   Colors.black,
                   () {
                     Navigator.pop(context);
-                    _showViewAlert(childName);
+                    _showViewAlert(notif);
                   },
                 ),
                 const SizedBox(width: 10),
@@ -184,7 +257,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  void _showUnblockConfirm(String childName) {
+  void _showUnblockConfirm(Map<String, dynamic> notif) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -192,13 +265,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Column(
           children: [
-            Icon(Icons.account_circle, size: 60, color: Colors.grey),
+            Icon(Icons.warning_amber_rounded, size: 60, color: Colors.red),
             Text(
-              "Unblock Conversation",
+              "Confirm Unblock",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF2E7D32),
-                fontSize: 18,
               ),
             ),
           ],
@@ -207,17 +279,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           "Confirm that this conversation is not dangerous for your child?",
           textAlign: TextAlign.center,
         ),
-        actionsPadding: const EdgeInsets.only(bottom: 20),
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildUnifiedButton(
-                "Yes",
-                Colors.red,
-                Colors.white,
-                () => Navigator.pop(context),
-              ),
+              _buildUnifiedButton("Yes", Colors.red, Colors.white, () {
+                Navigator.pop(context);
+                _unblockNotification(notif['notification_id']);
+              }),
               const SizedBox(width: 10),
               _buildUnifiedButton(
                 "No",
@@ -225,11 +294,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 Colors.black,
                 () {
                   Navigator.pop(context);
-                  _showViewAlert(childName);
+                  _showViewAlert(notif);
                 },
               ),
             ],
           ),
+          const SizedBox(height: 10),
         ],
       ),
     );

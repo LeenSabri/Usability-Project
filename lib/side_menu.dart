@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'children_information_screen.dart';
 import 'about_us_screen.dart';
 import 'link_child_screen.dart';
@@ -45,7 +46,6 @@ class _SideMenuState extends State<SideMenu> {
                 ],
               ),
             ),
-
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -105,8 +105,19 @@ class _SideMenuState extends State<SideMenu> {
                   _buildDrawerItem(
                     Icons.exit_to_app,
                     "Log Out",
-                    onTap: () {
-                      _navigate(context, "Log Out", const LoginScreen());
+                    onTap: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.clear();
+
+                      if (context.mounted) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
                     },
                   ),
                 ],
