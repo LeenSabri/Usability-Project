@@ -72,6 +72,7 @@ class _SideMenuState extends State<SideMenu> {
                         context,
                         "Children Information",
                         const ChildrenInformationScreen(),
+
                       );
                     },
                   ),
@@ -80,6 +81,7 @@ class _SideMenuState extends State<SideMenu> {
                     "Link Child",
                     onTap: () {
                       _navigate(context, "Link Child", const LinkChildScreen());
+
                     },
                   ),
                   _buildDrawerItem(
