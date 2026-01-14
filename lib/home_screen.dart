@@ -9,6 +9,7 @@ import 'profile_screen.dart';
 import 'app_bar.dart';
 import 'main.dart';
 
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -25,6 +26,7 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 20,
           mainAxisSpacing: 20,
           children: [
+
             _buildHomeButton(
               context,
               Icons.person,
@@ -68,6 +70,7 @@ class HomeScreen extends StatelessWidget {
     String label,
     Widget? destination,
   ) {
+
     return InkWell(
       onTap: () async {
         if (destination != null) {
