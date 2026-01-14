@@ -3,14 +3,25 @@ import 'side_menu.dart';
 import 'app_bar.dart';
 
 class AboutUsScreen extends StatelessWidget {
-  const AboutUsScreen({super.key});
+  final bool isLoggedIn;
+
+  const AboutUsScreen({super.key, this.isLoggedIn = true});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
-      drawer: const SideMenu(),
-      appBar: const CustomAppBar(title: "About Us"),
+      drawer: isLoggedIn ? const SideMenu() : null,
+      appBar: isLoggedIn
+          ? const CustomAppBar(title: "About Us")
+          : AppBar(
+              title: const Text("About Us"),
+              backgroundColor: const Color(0xFF64A121),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -42,7 +53,6 @@ class AboutUsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
-
             const Row(
               children: [
                 Icon(Icons.email_outlined, size: 30),

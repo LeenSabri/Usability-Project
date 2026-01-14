@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'verification_screen.dart';
+import 'sign_up_screen.dart';
+import 'about_us_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       print("--- Attempting to connect to server ---");
-
       final loginUrl = Uri.parse('http://192.168.2.19:3000/parents/login');
 
       final loginResponse = await http
@@ -58,9 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
           )
           .timeout(const Duration(seconds: 10));
 
-      print("Status Code: ${loginResponse.statusCode}");
-      print("Response Body: ${loginResponse.body}");
-
       if (loginResponse.statusCode == 200 || loginResponse.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(
           loginResponse.body,
@@ -69,7 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
         if (responseData.containsKey('access_token')) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', responseData['access_token']);
-          print("Token saved successfully in local storage");
         }
 
         try {
@@ -97,7 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _showSnackBar(error['message'] ?? "Invalid login credentials");
       }
     } catch (e) {
-      print("Actual connection error: $e");
       _showSnackBar("Connection failed: Check server and IP address");
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -112,6 +108,20 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
+      floatingActionButton: FloatingActionButton(
+        mini: true,
+        backgroundColor: const Color(0xFF64A121),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AboutUsScreen(isLoggedIn: false),
+            ),
+          );
+        },
+        child: const Icon(Icons.info_outline, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -164,6 +174,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "You Don't Have an Account ? ",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignUpScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          color: Color(0xFF5BA320),
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

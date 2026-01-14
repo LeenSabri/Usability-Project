@@ -47,19 +47,23 @@ class FingerprintScreen extends StatelessWidget {
             const SizedBox(height: 120),
             Align(
               alignment: Alignment.bottomRight,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AboutUsScreen(),
-                    ),
-                  );
-                },
-                child: const Icon(
-                  Icons.info_outline,
-                  size: 45,
-                  color: Color(0xFF5BA320),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const AboutUsScreen(isLoggedIn: false),
+                      ),
+                    );
+                  },
+                  child: const Icon(
+                    Icons.info_outline,
+                    size: 45,
+                    color: Color(0xFF5BA320),
+                  ),
                 ),
               ),
             ),
