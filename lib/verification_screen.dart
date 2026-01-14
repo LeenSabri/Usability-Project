@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'fingerprint_screen.dart';
+import 'about_us_screen.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -42,12 +43,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
       } else {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text("الكود خاطئ")));
+        ).showSnackBar(const SnackBar(content: Text("wrong code")));
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("خطأ في الاتصال")));
+      ).showSnackBar(const SnackBar(content: Text("Connection error")));
     } finally {
       if (mounted) setState(() => _isVerifying = false);
     }
@@ -57,6 +58,20 @@ class _VerificationScreenState extends State<VerificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E2D2),
+      floatingActionButton: FloatingActionButton(
+        mini: true,
+        backgroundColor: const Color(0xFF64A121),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AboutUsScreen(isLoggedIn: false),
+            ),
+          );
+        },
+        child: const Icon(Icons.info_outline, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -98,7 +113,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         backgroundColor: const Color(0xFF64A121),
                       ),
                       child: _isVerifying
-                          ? const CircularProgressIndicator()
+                          ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                               "Verify & Next",
                               style: TextStyle(color: Colors.white),
