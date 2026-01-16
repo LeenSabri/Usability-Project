@@ -104,20 +104,61 @@ class _SideMenuState extends State<SideMenu> {
                     Icons.exit_to_app,
                     "Log Out",
                     onTap: () async {
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.clear();
-
-                      if (context.mounted) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Confirm Logout"),
+                          content: const Text(
+                            "Are you sure you want to log out?",
                           ),
-                          (route) => false,
-                        );
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text("Log Out"),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true) {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.clear();
+
+                        if (context.mounted) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        }
                       }
                     },
                   ),
+
+                  // _buildDrawerItem(
+                  //   Icons.exit_to_app,
+                  //   "Log Out",
+                  //   onTap: () async {
+                  //     final prefs = await SharedPreferences.getInstance();
+                  //     await prefs.clear();
+
+                  //     if (context.mounted) {
+                  //       Navigator.pushAndRemoveUntil(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const LoginScreen(),
+                  //         ),
+                  //         (route) => false,
+                  //       );
+                  //     }
+                  //   },
+                  // ),
                 ],
               ),
             ),
