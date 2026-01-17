@@ -34,21 +34,46 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   bool _isLoading = false;
+  bool _hidePassword = true;
+
+  String? emailError;
+  String? passwordError;
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email);
+  }
 
   Future<void> _handleLogin() async {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showSnackBar("Please enter email and password");
+    setState(() {
+      emailError = null;
+      passwordError = null;
+    });
+
+    if (email.isEmpty) {
+      setState(() => emailError = "Email is required");
+      return;
+    }
+    if (!_isValidEmail(email)) {
+      setState(() => emailError = "Enter a valid email address");
+      return;
+    }
+    if (password.isEmpty) {
+      setState(() => passwordError = "Password is required");
+      return;
+    }
+    if (password.isEmpty) {
+      setState(() => passwordError = "Password is required");
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      print("--- Attempting to connect to server ---");
       final loginUrl = Uri.parse('http://192.168.2.19:3000/parents/login');
 
       final loginResponse = await http
@@ -75,9 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
             headers: {"Content-Type": "application/json"},
             body: jsonEncode({"email": email}),
           );
-        } catch (e) {
-          print("Non-critical error in sending code: $e");
-        }
+        } catch (_) {}
 
         _showSnackBar("Login successful");
 
@@ -144,9 +167,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Column(
                     children: [
-                      _buildField("Email", emailController, false),
+                      _buildField(
+                        "Email",
+                        emailController,
+                        false,
+                        hint: "example@mail.com",
+                        error: emailError,
+                      ),
                       const SizedBox(height: 15),
-                      _buildField("Password", passwordController, true),
+                      _buildPasswordField(),
                       const SizedBox(height: 25),
                       SizedBox(
                         width: double.infinity,
@@ -164,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: Colors.white,
                                 )
                               : const Text(
-                                  "Sign In",
+                                  "Sign In – Verify Email",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -180,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "You Don't Have an Account ? ",
+                      "You don’t have an account? ",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     GestureDetector(
@@ -214,8 +243,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildField(
     String label,
     TextEditingController controller,
-    bool isPass,
-  ) {
+    bool isPass, {
+    String? hint,
+    String? error,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -225,8 +256,45 @@ class _LoginScreenState extends State<LoginScreen> {
           controller: controller,
           obscureText: isPass,
           decoration: InputDecoration(
+            hintText: hint,
+            errorText: error,
             filled: true,
             fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Password", style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 5),
+        TextField(
+          controller: passwordController,
+          obscureText: _hidePassword,
+          decoration: InputDecoration(
+            hintText: "Enter your password",
+            errorText: passwordError,
+            filled: true,
+            fillColor: Colors.white,
+            suffixIcon: Tooltip(
+              message: _hidePassword ? "Show password" : "Hide password",
+              child: IconButton(
+                icon: Icon(
+                  _hidePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() => _hidePassword = !_hidePassword);
+                },
+              ),
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,

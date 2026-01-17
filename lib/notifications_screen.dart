@@ -48,6 +48,47 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _markAsRead(int notificationId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      final response = await http.patch(
+        Uri.parse(
+          'http://192.168.2.19:3000/notifications/read/$notificationId',
+        ),
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          final index = _notifications.indexWhere(
+            (n) => n['notification_id'] == notificationId,
+          );
+          if (index != -1) {
+            _notifications[index]['is_read'] = true;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint("Error marking as read: $e");
+    }
+  }
+
+  Future<void> _softDeleteNotification(int id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      await http.delete(
+        Uri.parse('http://192.168.2.19:3000/notifications/$id'),
+        headers: {"Authorization": "Bearer $token"},
+      );
+    } catch (e) {
+      debugPrint("Error deleting notification: $e");
+    }
+  }
+
   Future<void> _unblockNotification(int notificationId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -75,6 +116,29 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<bool> _confirmDelete() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Delete Notification"),
+            content: const Text(
+              "Are you sure you want to remove this notification?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("No"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Yes"),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,7 +154,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   : ListView.builder(
                       itemCount: _notifications.length,
                       itemBuilder: (context, index) {
-                        return _buildNotificationCard(_notifications[index]);
+                        final notif = _notifications[index];
+                        final id = notif['notification_id'];
+
+                        return Dismissible(
+                          key: ValueKey(id),
+                          direction: DismissDirection.startToEnd,
+                          confirmDismiss: (_) => _confirmDelete(),
+                          background: Container(
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.only(left: 20),
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                          ),
+                          onDismissed: (_) async {
+                            setState(() {
+                              _notifications.removeAt(index);
+                            });
+                            await _softDeleteNotification(id);
+                          },
+                          child: _buildNotificationCard(notif),
+                        );
                       },
                     ),
             ),
@@ -100,30 +191,44 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _buildNotificationCard(Map<String, dynamic> notif) {
     String childName = notif['child_name'] ?? "Child Name";
     String status = notif['status'] ?? "blocked";
+    bool isRead = notif['is_read'] ?? false;
 
     return InkWell(
-      onTap: () => _showViewAlert(notif),
+      onTap: () {
+        _markAsRead(notif['notification_id']);
+        _showViewAlert(notif);
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: status == "unblocked"
-              ? Colors.white70
+          color: (isRead || status == "unblocked")
+              ? Colors.white
               : const Color(0xFFD6E6D1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.black12),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Text(
-              childName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    childName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const Text(
+                    "We have blocked a message for your child in Luanti",
+                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                ],
+              ),
             ),
-            const Text(
-              "We have blocked a message for your child in Luanti",
-              style: TextStyle(fontSize: 14, color: Colors.black87),
-            ),
+            const Icon(Icons.chevron_right, size: 30, color: Color(0xFF2E7D32)),
           ],
         ),
       ),
@@ -132,7 +237,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   void _showViewAlert(Map<String, dynamic> notif) {
     String childName = notif['child_name'] ?? "Your Child";
-
     showDialog(
       context: context,
       barrierDismissible: false,

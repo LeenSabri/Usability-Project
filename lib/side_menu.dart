@@ -11,13 +11,17 @@ import 'main.dart';
 class SideMenu extends StatefulWidget {
   const SideMenu({super.key});
 
+  static String selectedItem = 'Home Page';
+
+  static void updateSelected(String title) {
+    selectedItem = title;
+  }
+
   @override
   State<SideMenu> createState() => _SideMenuState();
 }
 
 class _SideMenuState extends State<SideMenu> {
-  static String selectedItem = 'Home Page';
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -53,16 +57,17 @@ class _SideMenuState extends State<SideMenu> {
                   _buildDrawerItem(
                     Icons.home,
                     "Home Page",
-                    onTap: () {
-                      _navigate(context, "Home Page", const HomeScreen());
-                    },
+                    onTap: () =>
+                        _navigate(context, "Home Page", const HomeScreen()),
                   ),
                   _buildDrawerItem(
                     Icons.account_circle,
                     "Parent Profile",
-                    onTap: () {
-                      _navigate(context, "Parent Profile", const ProfilePage());
-                    },
+                    onTap: () => _navigate(
+                      context,
+                      "Parent Profile",
+                      const ProfilePage(),
+                    ),
                   ),
                   _buildDrawerItem(
                     Icons.accessibility_new,
@@ -87,36 +92,54 @@ class _SideMenuState extends State<SideMenu> {
                   _buildDrawerItem(
                     Icons.notifications,
                     "Notifications",
-                    onTap: () {
-                      _navigate(
-                        context,
-                        "Notifications",
-                        const NotificationsScreen(),
-                      );
-                    },
+                    onTap: () => _navigate(
+                      context,
+                      "Notifications",
+                      const NotificationsScreen(),
+                    ),
                   ),
                   _buildDrawerItem(
                     Icons.info,
                     "About Us",
-                    onTap: () {
-                      _navigate(context, "About Us", const AboutUsScreen());
-                    },
+                    onTap: () =>
+                        _navigate(context, "About Us", const AboutUsScreen()),
                   ),
                   _buildDrawerItem(
                     Icons.exit_to_app,
                     "Log Out",
                     onTap: () async {
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.clear();
-
-                      if (context.mounted) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Confirm Logout"),
+                          content: const Text(
+                            "Are you sure you want to log out?",
                           ),
-                          (route) => false,
-                        );
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text("Log Out"),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true) {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.clear();
+                        if (context.mounted) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        }
                       }
                     },
                   ),
@@ -131,22 +154,17 @@ class _SideMenuState extends State<SideMenu> {
 
   void _navigate(BuildContext context, String title, Widget screen) {
     setState(() {
-      selectedItem = title;
+      SideMenu.selectedItem = title;
     });
     Navigator.pop(context);
     Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 
   Widget _buildDrawerItem(IconData icon, String title, {VoidCallback? onTap}) {
-    bool isSelected = selectedItem == title;
+    bool isSelected = SideMenu.selectedItem == title;
 
     return Container(
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFD6E6D1) : Colors.transparent,
-        border: const Border(
-          bottom: BorderSide(color: Colors.black12, width: 0.5),
-        ),
-      ),
+      color: isSelected ? const Color(0xFFD6E6D1) : Colors.transparent,
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFF2E7D32)),
         title: Text(

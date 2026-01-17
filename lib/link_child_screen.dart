@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:usability_project/main.dart';
 import 'side_menu.dart';
 import 'app_bar.dart';
+import 'package:flutter/services.dart';
 
 class LinkChildScreen extends StatefulWidget {
   const LinkChildScreen({super.key});
@@ -21,13 +23,63 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
   String? _currentSelectedRelation;
   bool _isLoading = false;
 
+  String? usernameError;
+  String? fullNameError;
+  String? ageError;
+  String? passwordError;
+  String? relationError;
+
+  void _resetErrors() {
+    usernameError = null;
+    fullNameError = null;
+    ageError = null;
+    passwordError = null;
+    relationError = null;
+  }
+
+  void _clearForm() {
+    _usernameController.clear();
+    _fullNameController.clear();
+    _ageController.clear();
+    _passwordController.clear();
+    _currentSelectedRelation = null;
+    _resetErrors();
+    setState(() {});
+  }
+
   Future<void> _linkChild() async {
-    if (_usernameController.text.isEmpty ||
-        _fullNameController.text.isEmpty ||
-        _ageController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _currentSelectedRelation == null) {
-      _showSnackBar("Please fill all fields");
+    _resetErrors();
+    bool hasError = false;
+
+    if (_usernameController.text.trim().isEmpty) {
+      usernameError = "Username is required";
+      hasError = true;
+    }
+    if (_fullNameController.text.trim().isEmpty) {
+      fullNameError = "Full name is required";
+      hasError = true;
+    }
+    if (_ageController.text.trim().isEmpty) {
+      ageError = "Age is required";
+      hasError = true;
+    }
+    if (_passwordController.text.trim().isEmpty) {
+      passwordError = "Game password is required";
+      hasError = true;
+    }
+    if (_currentSelectedRelation == null) {
+      relationError = "Please select relation";
+      hasError = true;
+    }
+
+    final age = int.tryParse(_ageController.text.trim());
+    if (_ageController.text.isNotEmpty && (age == null || age <= 0)) {
+      ageError = "Enter a valid age";
+      hasError = true;
+    }
+
+    if (hasError) {
+      setState(() {});
       return;
     }
 
@@ -38,7 +90,13 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
       final String? token = prefs.getString('token');
 
       if (token == null) {
-        _showSnackBar("Session expired. Please login again.");
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (route) => false,
+          );
+        }
         return;
       }
 
@@ -51,7 +109,7 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
         body: jsonEncode({
           "luanti_username": _usernameController.text.trim(),
           "full_name": _fullNameController.text.trim(),
-          "age": int.tryParse(_ageController.text.trim()) ?? 0,
+          "age": age,
           "child_password": _passwordController.text.trim(),
           "relationship": _currentSelectedRelation,
         }),
@@ -59,13 +117,12 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         _showSnackBar("Child linked successfully!", isError: false);
+        _clearForm();
       } else {
         final errorData = jsonDecode(response.body);
-        _showSnackBar(
-          errorData['message']?.toString() ?? "Failed to link child",
-        );
+        _showSnackBar(errorData['message'] ?? "Failed to link child");
       }
-    } catch (e) {
+    } catch (_) {
       _showSnackBar("Connection error");
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -88,12 +145,12 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
       drawer: const SideMenu(),
       appBar: const CustomAppBar(title: "Link Child"),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              const SizedBox(height: 40),
+              Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: const Color(0xFFD6E6D1),
@@ -102,27 +159,31 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel("Username for child on Luanti"),
-                    _buildTextField(
-                      "Input text",
-                      controller: _usernameController,
+                    _buildField(
+                      "Username for child",
+                      "Enter child's username",
+                      _usernameController,
+                      error: usernameError,
                     ),
-                    const SizedBox(height: 15),
-                    _buildLabel("Full Name For Child"),
-                    _buildTextField(
-                      "Input text",
-                      controller: _fullNameController,
+                    _buildField(
+                      "Full Name",
+                      "Enter full name",
+                      _fullNameController,
+                      error: fullNameError,
                     ),
-                    const SizedBox(height: 15),
-                    _buildLabel("Age For Child"),
-                    _buildTextField(
-                      "Input text",
-                      controller: _ageController,
+                    _buildField(
+                      "Age",
+                      "Enter age",
+                      _ageController,
                       isNumber: true,
+                      error: ageError,
                     ),
-                    const SizedBox(height: 15),
-                    _buildLabel("Family Relation"),
-
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Family Relation",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 5),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
@@ -131,10 +192,9 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
-                          key: UniqueKey(),
                           isExpanded: true,
-                          hint: const Text("Select Relation"),
                           value: _currentSelectedRelation,
+                          hint: const Text("Select Relation"),
                           items: const [
                             DropdownMenuItem(
                               value: "father",
@@ -149,47 +209,51 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
                               child: Text("Guardian"),
                             ),
                           ],
-                          onChanged: (newValue) {
+                          onChanged: (v) {
                             setState(() {
-                              _currentSelectedRelation = newValue;
+                              _currentSelectedRelation = v;
+                              relationError = null;
                             });
                           },
                         ),
                       ),
                     ),
-
+                    if (relationError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Text(
+                          relationError!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 15),
-                    _buildLabel("Password"),
-                    _buildTextField(
-                      "Input text",
+                    _buildField(
+                      "Luanti Game Password",
+                      "Enter game password",
+                      _passwordController,
                       isPassword: true,
-                      controller: _passwordController,
+                      error: passwordError,
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 25),
                     Align(
-                      alignment: Alignment.bottomRight,
+                      alignment: Alignment.centerRight,
                       child: SizedBox(
-                        width: 120,
+                        width: 160,
                         height: 45,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _linkChild,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF64A121),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
                           ),
                           child: _isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
                                 )
                               : const Text(
-                                  "Next",
+                                  "Link Child",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -201,39 +265,46 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
-    );
-  }
-
-  Widget _buildTextField(
-    String hint, {
+  Widget _buildField(
+    String label,
+    String hint,
+    TextEditingController controller, {
     bool isPassword = false,
-    required TextEditingController controller,
     bool isNumber = false,
+    String? error,
   }) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          obscureText: isPassword,
+          keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+          inputFormatters: isNumber
+              ? [FilteringTextInputFormatter.digitsOnly]
+              : null,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.white,
+            errorText: error,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
         ),
-      ),
+        const SizedBox(height: 10),
+      ],
     );
   }
 }

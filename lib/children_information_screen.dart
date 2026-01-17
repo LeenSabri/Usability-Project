@@ -45,9 +45,6 @@ class _ChildrenInformationScreenState extends State<ChildrenInformationScreen> {
         },
       );
 
-      print("Fetch Children Status: ${response.statusCode}");
-      print("Fetch Children Body: ${response.body}");
-
       if (response.statusCode == 200) {
         setState(() {
           _children = jsonDecode(response.body);
@@ -60,12 +57,71 @@ class _ChildrenInformationScreenState extends State<ChildrenInformationScreen> {
         });
       }
     } catch (e) {
-      print("Error fetching children: $e");
       setState(() {
         _errorMessage = "Connection error. Please check your server.";
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _deleteChild(int childId, int index) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      final response = await http.delete(
+        Uri.parse('http://192.168.2.19:3000/children/$childId'),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _children.removeAt(index);
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Child removed successfully")),
+          );
+        }
+      } else {
+        _fetchChildren();
+      }
+    } catch (e) {
+      debugPrint("Error deleting child: $e");
+      _fetchChildren();
+    }
+  }
+
+  Future<bool?> _showDeleteConfirmation(String childName) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text(
+          "Delete Child",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          "Are you sure you want to remove $childName from your list?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              "Delete",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -111,10 +167,33 @@ class _ChildrenInformationScreenState extends State<ChildrenInformationScreen> {
         itemCount: _children.length,
         itemBuilder: (context, index) {
           final child = _children[index];
-          return _buildChildCard(
-            child['full_name'] ?? "No Name",
-            child['luanti_username'] ?? "No Username",
-            child['age']?.toString() ?? "0",
+          final childId = child['child_id'];
+          final childName = child['full_name'] ?? "No Name";
+
+          return Dismissible(
+            key: ValueKey(childId),
+            direction: DismissDirection.startToEnd,
+            confirmDismiss: (direction) async {
+              return await _showDeleteConfirmation(childName);
+            },
+            onDismissed: (direction) {
+              _deleteChild(childId, index);
+            },
+            background: Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(left: 20),
+              margin: const EdgeInsets.only(bottom: 15),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: const Icon(Icons.delete, color: Colors.white, size: 30),
+            ),
+            child: _buildChildCard(
+              childName,
+              child['luanti_username'] ?? "No Username",
+              child['age']?.toString() ?? "0",
+            ),
           );
         },
       ),
@@ -123,6 +202,7 @@ class _ChildrenInformationScreenState extends State<ChildrenInformationScreen> {
 
   Widget _buildChildCard(String name, String username, String age) {
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
