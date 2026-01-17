@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'side_menu.dart';
 import 'app_bar.dart';
+import './api/api_config.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -29,7 +30,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final String? token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.2.19:3000/notifications'),
+        Uri.parse('${ApiConfig.baseUrl}/notifications'),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -54,9 +55,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final String? token = prefs.getString('token');
 
       final response = await http.patch(
-        Uri.parse(
-          'http://192.168.2.19:3000/notifications/read/$notificationId',
-        ),
+        Uri.parse('${ApiConfig.baseUrl}/notifications/read/$notificationId'),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -81,7 +80,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final String? token = prefs.getString('token');
 
       await http.delete(
-        Uri.parse('http://192.168.2.19:3000/notifications/$id'),
+        Uri.parse('${ApiConfig.baseUrl}/notifications/$id'),
         headers: {"Authorization": "Bearer $token"},
       );
     } catch (e) {
@@ -95,9 +94,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final String? token = prefs.getString('token');
 
       final response = await http.patch(
-        Uri.parse(
-          'http://192.168.2.19:3000/notifications/unblock/$notificationId',
-        ),
+        Uri.parse('${ApiConfig.baseUrl}/notifications/unblock/$notificationId'),
         headers: {"Authorization": "Bearer $token"},
       );
 

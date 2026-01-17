@@ -5,6 +5,7 @@ import 'fingerprint_screen.dart';
 import 'about_us_screen.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import './api/api_config.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -65,7 +66,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     setState(() => _isVerifying = true);
 
     try {
-      final url = Uri.parse('http://192.168.2.19:3000/verification/verify');
+      final url = Uri.parse('${ApiConfig.baseUrl}/verification/verify');
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -92,7 +93,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   Future<void> _resendCode() async {
     try {
       await http.post(
-        Uri.parse('http://192.168.2.19:3000/verification/send'),
+        Uri.parse('${ApiConfig.baseUrl}/verification/send'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": widget.email}),
       );

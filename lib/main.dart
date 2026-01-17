@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'verification_screen.dart';
 import 'sign_up_screen.dart';
 import 'about_us_screen.dart';
+import './api/api_config.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final loginUrl = Uri.parse('http://192.168.2.19:3000/parents/login');
+      final loginUrl = Uri.parse('${ApiConfig.baseUrl}/parents/login');
 
       final loginResponse = await http
           .post(
@@ -96,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         try {
           await http.post(
-            Uri.parse('http://192.168.2.19:3000/verification/send'),
+            Uri.parse('${ApiConfig.baseUrl}/verification/send'),
             headers: {"Content-Type": "application/json"},
             body: jsonEncode({"email": email}),
           );
