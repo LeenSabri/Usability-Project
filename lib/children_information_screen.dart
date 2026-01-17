@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'side_menu.dart';
 import 'app_bar.dart';
+import './api/api_config.dart';
 
 class ChildrenInformationScreen extends StatefulWidget {
   const ChildrenInformationScreen({super.key});
@@ -38,7 +39,7 @@ class _ChildrenInformationScreenState extends State<ChildrenInformationScreen> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.2.19:3000/children'),
+        Uri.parse('${ApiConfig.baseUrl}/children'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -70,7 +71,7 @@ class _ChildrenInformationScreenState extends State<ChildrenInformationScreen> {
       final String? token = prefs.getString('token');
 
       final response = await http.delete(
-        Uri.parse('http://192.168.2.19:3000/children/$childId'),
+        Uri.parse('${ApiConfig.baseUrl}/children/$childId'),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'verification_screen.dart';
 import 'about_us_screen.dart';
+import './api/api_config.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -19,6 +20,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _isLoading = false;
 
+  bool _isPasswordDirty = false;
+  bool _isPasswordStrong = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_validatePasswordLive);
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _emailController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _validatePasswordLive() {
+    final password = _passwordController.text;
+    if (password.isEmpty) {
+      setState(() {
+        _isPasswordDirty = false;
+        _isPasswordStrong = false;
+      });
+      return;
+    }
+
+    final regex = RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+    );
+
+    setState(() {
+      _isPasswordDirty = true;
+      _isPasswordStrong = regex.hasMatch(password);
+    });
+  }
+
   Future<void> _handleSignUp() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -26,6 +64,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       _showError("Please fill in all fields");
+      return;
+    }
+
+    if (!_isPasswordStrong) {
+      _showError("Please use a stronger password as required");
       return;
     }
 
@@ -38,7 +81,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.2.19:3000/parents/signup'),
+        Uri.parse('${ApiConfig.baseUrl}/parents/signup'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
       );
@@ -96,7 +139,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 50),
                 Image.asset(
                   'assets/logo.png',
-                  height: 200,
+                  height: 180,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => const Icon(
                     Icons.security,
@@ -104,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     color: Colors.green,
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
 
                 Container(
                   padding: const EdgeInsets.all(25),
@@ -121,13 +164,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _emailController,
                       ),
                       const SizedBox(height: 15),
+
                       _buildLabel("Password"),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          "Safety Rule: at least 8 chars, uppercase, lowercase, number & symbol.",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: !_isPasswordDirty
+                                ? const Color(0xFF2E7D32)
+                                : (_isPasswordStrong
+                                      ? Colors.green[800]
+                                      : Colors.red[800]),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                       _buildTextField(
                         "............",
                         isPassword: true,
                         controller: _passwordController,
+                        hasError: _isPasswordDirty && !_isPasswordStrong,
+                        isStrong: _isPasswordStrong,
                       ),
                       const SizedBox(height: 15),
+
                       _buildLabel("Confirm Password"),
                       _buildTextField(
                         "............",
@@ -208,6 +270,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     String hint, {
     bool isPassword = false,
     required TextEditingController controller,
+    bool hasError = false,
+    bool isStrong = false,
   }) {
     return TextField(
       controller: controller,
@@ -216,9 +280,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
         hintText: hint,
         filled: true,
         fillColor: Colors.white,
-        border: OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+          borderSide: hasError
+              ? const BorderSide(color: Colors.red, width: 2)
+              : (isStrong
+                    ? const BorderSide(color: Colors.green, width: 2)
+                    : BorderSide.none),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: hasError
+                ? Colors.red
+                : (isStrong ? Colors.green : const Color(0xFF64A121)),
+            width: 2,
+          ),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 15,

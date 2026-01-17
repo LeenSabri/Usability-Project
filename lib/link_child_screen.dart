@@ -6,6 +6,7 @@ import 'package:usability_project/main.dart';
 import 'side_menu.dart';
 import 'app_bar.dart';
 import 'package:flutter/services.dart';
+import './api/api_config.dart';
 
 class LinkChildScreen extends StatefulWidget {
   const LinkChildScreen({super.key});
@@ -101,7 +102,7 @@ class _LinkChildScreenState extends State<LinkChildScreen> {
       }
 
       final response = await http.post(
-        Uri.parse('http://192.168.2.19:3000/parent-child/create-and-link'),
+        Uri.parse('${ApiConfig.baseUrl}/parent-child/create-and-link'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

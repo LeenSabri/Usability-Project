@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'side_menu.dart';
 import 'app_bar.dart';
+import './api/api_config.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -41,7 +42,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       final String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse('http://192.168.2.19:3000/parents/change-password'),
+        Uri.parse('${ApiConfig.baseUrl}/parents/change-password'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

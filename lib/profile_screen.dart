@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'side_menu.dart';
 import 'change_password_screen.dart';
 import 'app_bar.dart';
+import './api/api_config.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -30,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final String? token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.2.19:3000/parents/profile'),
+        Uri.parse('${ApiConfig.baseUrl}/parents/profile'),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
