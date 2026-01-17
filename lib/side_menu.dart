@@ -72,20 +72,22 @@ class _SideMenuState extends State<SideMenu> {
                   _buildDrawerItem(
                     Icons.accessibility_new,
                     "Children Information",
-                    onTap: () => _navigate(
-                      context,
-                      "Children Information",
-                      const ChildrenInformationScreen(),
-                    ),
+                    onTap: () {
+                      _navigate(
+                        context,
+                        "Children Information",
+                        const ChildrenInformationScreen(),
+
+                      );
+                    },
                   ),
                   _buildDrawerItem(
                     Icons.group_add,
                     "Link Child",
-                    onTap: () => _navigate(
-                      context,
-                      "Link Child",
-                      const LinkChildScreen(),
-                    ),
+                    onTap: () {
+                      _navigate(context, "Link Child", const LinkChildScreen());
+
+                    },
                   ),
                   _buildDrawerItem(
                     Icons.notifications,

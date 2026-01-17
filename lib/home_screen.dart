@@ -9,6 +9,7 @@ import 'profile_screen.dart';
 import 'app_bar.dart';
 import 'main.dart';
 
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -22,16 +23,30 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Welcome In SafeLuanti App",
-                style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2E7D32),
-                ),
-              ),
+
+            _buildHomeButton(
+              context,
+              Icons.person,
+              "Parent Profile",
+              const ProfilePage(),
+            ),
+            _buildHomeButton(
+              context,
+              Icons.accessibility_new,
+              "Children Information",
+              const ChildrenInformationScreen(),
+            ),
+            _buildHomeButton(
+              context,
+              Icons.group_add,
+              "Link Child",
+              const LinkChildScreen(),
+            ),
+            _buildHomeButton(
+              context,
+              Icons.notifications_active,
+              "Notifications",
+              const NotificationsScreen(),
             ),
             const SizedBox(height: 15),
             Expanded(
@@ -86,6 +101,7 @@ class HomeScreen extends StatelessWidget {
     String label,
     Widget? destination,
   ) {
+
     return InkWell(
       onTap: () async {
         if (destination != null) {
